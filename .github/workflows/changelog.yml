@@ -43,7 +43,7 @@ jobs:
           git commit -m "chore: Update changelog"
           git push origin "changelog/${VERSION}" --force
         env:
-          VERSION: ${{ GITHUB_SHA }}
+          VERSION: 1.2.0
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check out repository
@@ -60,4 +60,4 @@ jobs:
           fi
         env: 
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ GITHUB_SHA }}
+          VERSION: 1.2.0
