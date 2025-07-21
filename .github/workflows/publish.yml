@@ -1,0 +1,29 @@
+name: Publish
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  RUSTFLAGS: "-D warnings"
+  RUSTDOCFLAGS: '--deny warnings'
+  MINIMUM_SUPPORTED_RUST_VERSION: 1.85.0
+  DOCKER_REGISTRY: ghcr.io
+
+permissions:
+  id-token: write
+  packages: write
+  contents: write
+  attestations: write
+  pull-requests: write
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+  workflow_call:
+
+jobs:  
+  changelog:
+    uses: ./.github/workflows/changelog.yml
+    name: Create changelog
+    secrets: inherit
