@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 0
       - name: Generate a changelog
         run: |
-          date +%Y-%m-%d > CHANGELOG.md
+          date +%Y-%m-%d >> CHANGELOG.md
         env:
           OUTPUT: CHANGELOG.md
           GITHUB_REPO: ${{ github.repository }}
@@ -43,7 +43,7 @@ jobs:
           git commit -m "chore: Update changelog"
           git push origin "changelog/${VERSION}" --force
         env:
-          VERSION: ${{ steps.release.outputs.version }}
+          VERSION: ${{ GITHUB_SHA }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check out repository
@@ -60,4 +60,4 @@ jobs:
           fi
         env: 
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ steps.release.outputs.version }}
+          VERSION: ${{ GITHUB_SHA }}
