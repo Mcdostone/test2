@@ -43,14 +43,16 @@ jobs:
           git commit -m "chore: Update changelog"
           git push origin "changelog/${VERSION}" --force
         env:
-          VERSION: 1.2.0
+          VERSION: 1.3.0
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          ref: "changelog/${{ steps.release.outputs.version }}"
+          ref: "changelog/${VERSION}"
           persist-credentials: false
+        env:
+          VERSION: 1.3.0
       - name: Create pull request for changelog
         run: |
           alreadyExists=$(gh pr list --json headRefName | jq '.[] | select(.headRefName == "changelog/${VERSION}") | any')
@@ -60,4 +62,4 @@ jobs:
           fi
         env: 
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: 1.2.0
+          VERSION: 1.3.0
