@@ -8,13 +8,13 @@ jobs:
     steps:
       - name: Add PR to GitHub Project
         if: github.event.action == 'opened' || github.event.action == 'reopened'
-        uses: actions/add-to-project@1.0.2
+        uses: actions/add-to-project@v1.0.2
         with:
           project-url: 'https://github.com/users/Mcdostone/projects/3'
           github-token: ${{ secrets.PROJECT_MANAGEMENT}}
           labeled: 'In Progress'
 
-      - uses: actions/add-to-project@1.0.2
+      - uses: actions/add-to-project@v1.0.2
         if: github.event.action == 'merged'
         with:
           project-url: 'https://github.com/users/Mcdostone/projects/3'
