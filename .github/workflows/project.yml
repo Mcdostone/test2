@@ -6,6 +6,8 @@ jobs:
   add-to-project:
     runs-on: ubuntu-latest
     steps:
+      - name: Debug
+        run: echo ${{ github.event.action }}
       - name: Add PR to GitHub Project
         if: github.event.action == 'opened' || github.event.action == 'reopened'
         uses: actions/add-to-project@v1.0.2
