@@ -12,6 +12,8 @@ jobs:
         with:
           project: 'https://github.com/users/Mcdostone/projects/3'
           column_name: 'In Progress'
+        env:
+          MY_GITHUB_TOKEN: ${{ github.token }}
 
       - name: Update the status of the PR when merged
         uses: srggrs/assign-one-project-github-action@1.2.1
@@ -35,3 +37,5 @@ jobs:
         run: 
           VERSION=$(echo ${{ github.event.pull_request.base.ref }} | sed 's/release\///')
           gh pr edit ${{ github.event.pull_request.number }} --milestone "${VERSION}"
+        env:
+          GH_TOKEN: ${{ github.token }}
