@@ -13,7 +13,7 @@ jobs:
           project: 'https://github.com/users/Mcdostone/projects/3'
           column_name: 'In Progress'
         env:
-          MY_GITHUB_TOKEN: ${{ github.token }}
+          MY_GITHUB_TOKEN: ${{ secrets.PROJECT_MANAGEMENT}}
 
       - name: Update the status of the PR when merged
         uses: srggrs/assign-one-project-github-action@1.2.1
