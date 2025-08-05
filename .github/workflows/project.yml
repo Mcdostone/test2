@@ -36,9 +36,9 @@ jobs:
       
       - uses: actions/checkout@v4.2.2
       - name: Add milestone to the merged PR
-        run: 
+        run: |
           VERSION=$(echo ${{ github.event.pull_request.base.ref }} | sed 's/release\///')
-          echo "::notice title=Version:: Ajout de la milestone ${VERSION}"
+          echo "::notice title=Milestone:: Ajout de la milestone ${VERSION}"
           gh pr edit ${{ github.event.pull_request.number }} --milestone "${VERSION}"
         env:
           GH_TOKEN: ${{ github.token }}
