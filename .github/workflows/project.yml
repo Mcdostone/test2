@@ -25,6 +25,7 @@ jobs:
 
   on-pull-request-merged:
     runs-on: ubuntu-latest
+    # if: github.event.action == 'merged'
 #    if: github.event.action == 'closed' && github.event.pull_request.merged == true && startsWith(github.event.pull_request.base.ref, 'release/')
     steps:
 #      - name: Update the status of the PR when merged
@@ -37,6 +38,7 @@ jobs:
       - name: Add milestone to the merged PR
         run: 
           VERSION=$(echo ${{ github.event.pull_request.base.ref }} | sed 's/release\///')
+          echo "::notice title=Version:: Ajout de la milestone ${VERSION}"
           gh pr edit ${{ github.event.pull_request.number }} --milestone "${VERSION}"
         env:
           GH_TOKEN: ${{ github.token }}
