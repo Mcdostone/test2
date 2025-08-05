@@ -7,26 +7,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add PR to GitHub Project
-        uses: srggrs/assign-one-project-github-action@1.2.1
         if: github.event.action == 'opened' || github.event.action == 'reopened'
+        uses: actions/add-to-project@1.0.2
         with:
-          project: 'https://github.com/users/Mcdostone/projects/3'
-          column_name: 'In Progress'
-        env:
-          MY_GITHUB_TOKEN: ${{ secrets.PROJECT_MANAGEMENT}}
+          project-url: 'https://github.com/users/Mcdostone/projects/3'
+          github-token: ${{ secrets.PROJECT_MANAGEMENT}}
+          labeled: 'In Progress'
 
-      - name: Update the status of the PR when merged
-        uses: srggrs/assign-one-project-github-action@1.2.1
+      - uses: actions/add-to-project@1.0.2
         if: github.event.action == 'merged'
         with:
-          project: 'https://github.com/users/Mcdostone/projects/3'
-          column_name: 'Merged'
+          project-url: 'https://github.com/users/Mcdostone/projects/3'
+          github-token: ${{ secrets.PROJECT_MANAGEMENT}}
+          labeled: 'Merged'
 
 
   on-pull-request-merged:
     runs-on: ubuntu-latest
-    # if: github.event.action == 'merged'
-#    if: github.event.action == 'closed' && github.event.pull_request.merged == true && startsWith(github.event.pull_request.base.ref, 'release/')
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true && startsWith(github.event.pull_request.base.ref, 'release/')
     steps:
 #      - name: Update the status of the PR when merged
 #        uses: srggrs/assign-one-project-github-action@1.2.1
