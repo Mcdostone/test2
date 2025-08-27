@@ -33,7 +33,7 @@ jobs:
           git push -u origin $BRANCH_NAME
       - name: Update Chart.yaml
         run: |
-          sed -i "s/^version: .*/version: ${VERSION}/" chart/
+          sed -i "s/^version: .*/version: ${VERSION}/" chart/Chart.yaml
           sed -i "s/^appVersion: .*/appVersion: ${VERSION}/" chart/Chart.yaml
       - name: Commit changes
         run: |
