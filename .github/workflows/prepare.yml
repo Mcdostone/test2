@@ -3,12 +3,6 @@ name: prepare
 on:
   workflow_dispatch:
     inputs:
-      #type:
-      #  type: choice
-      #  required: true
-      #  options:
-      #    - release
-      #    - feature
       version:
         type: string
         required: true
@@ -35,6 +29,11 @@ jobs:
         run: |
           sed -i "s/^version: .*/version: ${VERSION}/" chart/Chart.yaml
           sed -i "s/^appVersion: .*/appVersion: ${VERSION}/" chart/Chart.yaml
+      
+      - name: Update Chart.yaml
+        run: |
+          sed -i "s/^version: .*/version: ${VERSION}/" chart/Chart.yaml
+          sed -i "s/^appVersion: .*/appVersion: ${VERSION}-RC/" chart/Chart.yaml
       - name: Commit changes
         run: |
           git add chart/Chart.yaml
