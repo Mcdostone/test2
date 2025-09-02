@@ -1,37 +1,31 @@
 name: project
 on:
   pull_request:
-    types: [opened, closed ]
+    types: [opened, closed, reopened]
 jobs:
-  add-to-project:
+
+  normalize-pull-request-title:
     runs-on: ubuntu-latest
+    if: github.event.action == 'opened'
     steps:
-      - name: Add PR to GitHub Project
-        uses: srggrs/assign-one-project-github-action@1.2.1
-        if: github.event.action == 'opened'
+      - name: Compute  Pull Request Title
+        uses: actions/github-script@v7
+        id: compute_title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
         with:
-          project: 'https://github.com/users/Mcdostone/projects/3'
-          column_name: 'In Progress'
-
-      - name: Update the status of the PR when merged
-        uses: srggrs/assign-one-project-github-action@1.2.1
-        if: github.event.action == 'merged'
-        with:
-          project: 'https://github.com/users/Mcdostone/projects/3'
-          column_name: 'Merged'
-
-
-  on-pull-request-merged:
-    runs-on: ubuntu-latest
-#    if: github.event.action == 'closed' && github.event.pull_request.merged == true && startsWith(github.event.pull_request.base.ref, 'release/')
-    steps:
-#      - name: Update the status of the PR when merged
-#        uses: srggrs/assign-one-project-github-action@1.2.1
-#        with:
-#          project: 'https://github.com/orgs/MAIFX/projects/13/'
-#          column_name: 'Merged'
-      
-      - name: Add milestone to the merged PR
-        run: 
-          VERSION=$(echo ${{ github.event.pull_request.base.ref }} | sed 's/release\///')
-          gh pr edit ${{ github.event.pull_request.number }} --milestone "${VERSION}"
+          result-encoding: string
+          script: |
+            let pullRequestTitle = process.env.TITLE || process.argv[2];
+            const regex = /([0-9]{4,}(-[0-9]{4,})*)[\s:\-\]]*(.+)/;
+            const match = pullRequestTitle.match(regex);
+            if (match) {
+              pullRequestTitle = `TEST-${match[1]} - ${match[3].trim()}`;
+            }
+              console.log(pullRequestTitle);
+              return pullRequestTitle;
+      - name: Change Pull Request Title
+        if: steps.compute_title.outputs.result != github.event.pull_request.title
+        run: |
+          echo "::notice title=Pull Request Title:: Changement du titre de la Pull Request en '${{ steps.compute_title.outputs.result }}'"
+          gh pr edit ${{ github.event.pull_request.number }} --title "${{ steps.compute_title.outputs.result }}"
