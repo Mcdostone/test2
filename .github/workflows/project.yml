@@ -29,5 +29,5 @@ jobs:
         run: |
           echo "::notice title=Pull Request Title:: Changement du titre de la Pull Request en '${{ steps.compute_title.outputs.result }}'"
           gh pr edit ${{ github.event.pull_request.number }} --title "${{ steps.compute_title.outputs.result }}"
-          env:
-            GH_TOKEN: ${{ github.token }}
+        env:
+          GH_TOKEN: ${{ github.token }}
