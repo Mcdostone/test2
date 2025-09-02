@@ -16,20 +16,22 @@ jobs:
           script: |
             const pr = context.payload.pull_request;
             const regex = /([0-9]{4,}(-[0-9]{4,})*)[\s:\-\]]*(.+)/;
+
             let title = pr.title;
+            let body = pr.body || "";
             const match = title.match(regex);
             if (match) {
-                title = `RPUSATIS-${match[1]} - ${match[3].trim()}`;
-            }
-
-            let body = pr.body || "";
-            if (!body.trim().endsWith("thanks")) {
-                body = body.trim() + "\n\nthanks";
+                const ticket = `RPUSATIS-${match[1]}`;
+                title = `${ticket} - ${match[3].trim()}`;
+                badge = `[![${ticket}](https://img.shields.io/badge/${ticket.replace('-', '--')}-black?labelColor=black&logo=jira)](https://atlassian.net/browse/${ticket})`
+                if(!body.includes(badge)) {
+                    body = `${badge}\n\n${body}`;
+                }
             }
             await github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: pr.number,
-              title: title,
-              body: body
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                title: title,
+                body: body
             });
