@@ -1,46 +1,65 @@
-name: prepare
+name: Next release
 
+permissions:
+  contents: write
+  actions: write
+  packages: write
+  pull-requests: write
+  id-token: write
 on:
   workflow_dispatch:
     inputs:
-      #type:
-      #  type: choice
-      #  required: true
-      #  options:
-      #    - release
-      #    - feature
       version:
-        type: string
+        description: 'Par exemple "2.92.0"'
         required: true
-        description: la version à préparer, par exemple "1.68.3"
+        type: string
+  workflow_call:
+    inputs:
+      version:
+        description: 'Par exemple "2.92.0"'
+        required: true
+        type: string
+
 
 jobs:
-  prepare:
+
+  prepare-next-release:
     runs-on: ubuntu-latest
     env:
-          VERSION: ${{ github.event.inputs.version }}
+      branch: "release/${{ inputs.version }}"
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Git
+      - uses: actions/checkout@v5.0.0
+        with:
+          fetch-tags: 'true'
+          fetch-depth: 0
+      - name: Prepare next release branch
+        continue-on-error: true
         run: |
-          git config --local user.name "GitHub Actions"
-          git config --local user.email "actions@github.com"
-      - name: Create branch
-        run: |
-          BRANCH_NAME="release/${VERSION}"
-          git checkout -b $BRANCH_NAME
-          git push -u origin $BRANCH_NAME
-      - name: Update Chart.yaml
-        run: |
-          sed -i "s/^version: .*/version: ${VERSION}/" chart/Chart.yaml
-          sed -i "s/^appVersion: .*/appVersion: ${VERSION}/" chart/Chart.yaml
-      - name: Commit changes
-        run: |
-          git add chart/Chart.yaml
-          git commit -m "Prepare release ${VERSION}"
-          git push origin $BRANCH_NAME
-      - name: Create Pull Request
-        run: gh pr create --head "$BRANCH_NAME" --title "release ${VERSION}" --body ""
+          git checkout -b ${{ env.branch }}
+          set +e
+          sed -Ei "s/version=(.+)/version=${{ steps.next.outputs.version }}/" gradle.properties
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          git config --global push.autoSetupRemote true
+          git add gradle.properties
+          git commit -m "ci: Prepare next release branch ${{ steps.next.outputs.version }}"
+          git push origin "${{ env.branch }}"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Milestone
+        continue-on-error: true
+        run: |
+          gh api \
+          --method POST \
+          -H "Accept: application/vnd.github.v3+json" \
+          /repos/${{ github.repository }}/milestones \
+          -f title='${{ steps.next.outputs.version }}' \
+          -f state='open' || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create PR
+        continue-on-error: true
+        run: gh pr create --head "$branch" --label 'release' --title "release {{ inputs.version }}" --body "PR pour la release {{ inputs.version }}."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
