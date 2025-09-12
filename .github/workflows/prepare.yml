@@ -22,7 +22,6 @@ on:
 
 
 jobs:
-
   prepare-next-release:
     runs-on: ubuntu-latest
     env:
@@ -53,13 +52,13 @@ jobs:
           --method POST \
           -H "Accept: application/vnd.github.v3+json" \
           /repos/${{ github.repository }}/milestones \
-          -f title='${{ steps.next.outputs.version }}' \
+          -f title='${{ inputs.version }}' \
           -f state='open' || true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create PR
         continue-on-error: true
-        run: gh pr create --head "$branch" --label 'release' --title "release {{ inputs.version }}" --body "PR pour la release {{ inputs.version }}."
+        run: gh pr create --head "$branch" --label 'release' --title "release ${{ inputs.version }}" --body "PR pour la release ${{ inputs.version }}."
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
